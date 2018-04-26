@@ -1,40 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hello World DApp</title>
+  <title>Vothereum</title>
   <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
 </head>
 <body class="container">
-  <h1>A Simple Hello World Voting Application</h1>
-  <div id="address"></div>
-  <div class="table-responsive">
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Candidate</th>
-          <th>Votes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Rama</td>
-          <td id="candidate-1"></td>
-        </tr>
-        <tr>
-          <td>Nick</td>
-          <td id="candidate-2"></td>
-        </tr>
-        <tr>
-          <td>Jose</td>
-          <td id="candidate-3"></td>
-        </tr>
-      </tbody>
-    </table>
-    <div id="msg"></div>
-  </div>
-  <input type="text" id="candidate" />
-  <a href="#" onclick="voteForCandidate()" class="btn btn-primary">Vote</a>
+  <h1>Decentralized Voting Application on Ethereum Blockchain</h1>
+
+  <form onsubmit="initializeBallot()">
+    Candidate List(For admins):<br>
+    <input type="text" name="candidateList" id="candList"><br>
+    Voter List(For admins):<br>
+    <input type="text" name="voterList" id="voterList"><br>
+    <input type="submit" value="Initialize"><br>
+  </form>
+
+  <form id="voteForm" onsubmit="vote()">
+    <div id="VoterListDiv"><br></div>
+    <div id="VoterDiv">Enter Your ID<br></div>
+    <div id="CandidatesDiv">Select Candidate<br></div>
+    <div id="SubmitButtonDiv"><br></div>
+  </form>
+
+  <button onclick="countVotes()">Count Votes(For admins)</button>
+
+  <form onsubmit="validateVote()">
+      Enter your ID to check if your vote has been counted or not:<br>
+      <input type="text" name="voterID" id="voterID"><br>
+    <input type="submit" value="Validate"><br>
+  </form>
+
+  <button onclick="getResult()">Get Results</button>
+  <div id="result"></div>
+
 </body>
 <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>

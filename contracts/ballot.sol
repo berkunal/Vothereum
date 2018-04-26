@@ -23,37 +23,46 @@ contract Ballot is Ownable {
 
     // Voter map. id to Voter object
     mapping (uint => Voter) private voters;
+    uint[] private votersKeys;
 
     // Candidate array
     Candidate[] private candidates;
+    uint[] private candidateIdList;
+    uint[] private results;
 
     // Vote array
     Vote[] private votes;
 
-    // Temporary Constructor
-    function Ballot(bytes32[] _candidateNames, uint[] _voterIds) public {
-        initializeCandidates(_candidateNames);
-        initializeVoters(_voterIds);
-    }
+    // Voting done or not
+    bool private counted;
 
-    function initializeCandidates(bytes32[] _candidates) public onlyOwner {
+    // Admin
+    function initializeCandidates(bytes32[] _candidates) external onlyOwner {
         for (uint i = 0; i < _candidates.length; i++) {
             candidates.push(Candidate({
                 id: i, 
                 name: _candidates[i], 
                 voteCount: 0
             }));
+            candidateIdList.push(i);
         }
+        counted = false;
     }
 
+    // Admin
     function initializeVoters(uint[] _voters) public onlyOwner {
         for (uint i = 0; i < _voters.length; i++) {
             voters[_voters[i]].id = _voters[i];
             voters[_voters[i]].voted = false;
+            votersKeys.push(_voters[i]);
         }
     }
 
+    // User
     function vote(uint _voterId, uint _candidateId) external onlyOwner {
+        // check if _voterId or _candidateId is exists
+        require(voterExists(_voterId) && candidateExists(_candidateId));
+
         // terminate if voted
         require(!voters[_voterId].voted);
 
@@ -68,23 +77,74 @@ contract Ballot is Ownable {
         voters[_voterId].voted = true;
     }
 
-    function countVotes() private onlyOwner returns (Candidate[]) {
+    // Admin
+    function countVotes() public onlyOwner {
+        // Update the votecount of candidates and mark votes counted
         for (uint i = 0; i < votes.length; i++) {
             candidates[votes[i].candidateId].voteCount++;
             votes[i].counted = true;
         }
-        return candidates;
+        counted = true;
+        // Fill the results array
+        for (i = 0; i < candidates.length; i++) {
+            results.push(i);
+            results.push(candidates[i].voteCount);
+        }
     }
 
-    function getCandidates() public view returns (Candidate[]) {
-        return candidates;
+    // Return the results of counting
+    function getResults() public view returns (uint[]) {
+        if (!counted) {
+            return;
+        } else {
+            return results;
+        }
     }
 
-    function getVoterVoted(uint i) public view returns (bool) {
-        return voters[i].voted;
+    // Voter's vote counted or not?
+    function validateVote(uint _voterId) public view returns (bool) {
+        for (uint i = 0; i < votes.length; i++) {
+            if (votes[i].voterId == _voterId) {
+                return votes[i].counted;
+            }
+        }
+        return false;
     }
 
-    function getVotes() public view returns (Vote[]) {
-        return votes;
+    // Return candidate name associated with the given candidate id
+    function getCandidateName(uint _candidateId) public view returns (bytes32) {
+        return candidates[_candidateId].name;
+    }
+
+    // Return candidate id list
+    function getCandidateIdList() public view returns (uint[]) {
+        return candidateIdList;
+    }
+
+    // Return voters' keys
+    function getVotersKeys() public view returns (uint[]) {
+        return votersKeys;
+    }
+
+    // Return true if Voter associated with given voter id is exist
+    function voterExists(uint _voterId) private view returns (bool) {
+        uint i;
+        for (i = 0; i < votersKeys.length; i++) {
+            if (votersKeys[i] == _voterId) {
+                break;
+            }
+        }
+        return i != votersKeys.length;
+    }
+
+    // Return true if Candidate associated with given candidate id is exist
+    function candidateExists(uint _candidateId) private view returns (bool) {
+        uint i;
+        for (i = 0; i < candidates.length; i++) {
+            if (candidates[i].id == _candidateId) {
+                break;
+            }
+        }
+        return i != candidates.length;
     }
 }
