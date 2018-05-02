@@ -15,9 +15,11 @@ import { default as contract } from 'truffle-contract'
  * https://gist.github.com/maheshmurthy/f6e96d6b3fff4cd4fa7f892de8a1a1b4#file-index-js
  */
 
-import voting_artifacts from '../../build/contracts/Ballot.json'
+import ballot_artifacts from '../../build/contracts/Ballot.json'
+import admin_artifacts from '../../build/contracts/Admin.json'
 
-var Ballot = contract(voting_artifacts);
+var Ballot = contract(ballot_artifacts);
+var Admin = contract(admin_artifacts);
 
 // Vote function
 window.vote = function() {
@@ -40,7 +42,6 @@ window.vote = function() {
 
 // Calls initCand and initVoter
 window.initializeBallot = function() {
-  console.log("hey1");
   var candidateList = document.getElementById("candList").value.split("-");
   var voterList = document.getElementById("voterList").value.split("-");
   for(var i=0; i<voterList.length; i++) { voterList[i] = +voterList[i]; }
@@ -115,6 +116,58 @@ window.validateVote = function() {
   })
 }
 
+// Add new ballot to admin
+function addBallot(ballotAddress) {
+  Admin.deployed().then(function(contractInstance) {
+    contractInstance.addBallot(ballotAddress)
+  })
+}
+
+
+// Initial admin and ballot selection page
+function selectionPage() {
+    var initialSelectionDiv = document.getElementById("InitialSelectionButtonDiv");
+    initialSelectionDiv.innerHTML = "";
+
+    // Admin button
+    var adminButton = document.createElement("input");
+    adminButton.type = "button";
+    adminButton.value = "Admin";
+    adminButton.onclick = function() {redirectToAdminPage()};
+    initialSelectionDiv.appendChild(adminButton);
+
+    // Ballot buttons
+    Admin.deployed().then(function(contractInstance) {
+      contractInstance.getBallots().then(function(ballotList) {
+        for (var i = 0; i < ballotList.length; i++) {
+          var ballotButton = document.createElement("input");
+          ballotButton.type = "button";
+          ballotButton.value = "Ballot " + i;
+          ballotButton.onclick = redirectToBallotPage(i);
+          initialSelectionDiv.appendChild(ballotButton);
+        }
+      })
+    })
+}
+
+// Arrange page to be a Admin page
+function redirectToAdminPage() {
+  //document.getElementById("InitialSelectionButtonDiv").innerHTML = "";
+
+  //document.getElementById("AdminDiv").innerHTML = document.getElementById("adminHTML").innerHTML;
+
+  window.location.href = "./app/admin.html";
+}
+
+// Arrange page to be a spesific Ballot page
+function redirectToBallotPage(ballotId) {
+  Admin.deployed().then(function(contractInstance) {
+    contractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
+      
+    })
+  })
+}
+
 // Initialization
 $( document ).ready(function() {
   if (typeof web3 !== 'undefined') {
@@ -128,8 +181,11 @@ $( document ).ready(function() {
   }
 
   Ballot.setProvider(web3.currentProvider);
+  Admin.setProvider(web3.currentProvider);
 
-  Ballot.deployed().then(function(contractInstance) {
+  selectionPage();
+
+  /*Ballot.deployed().then(function(contractInstance) {
     var voterDiv = document.getElementById("VoterDiv");
     var candidatesDiv = document.getElementById("CandidatesDiv");
     var submitButtonDiv = document.getElementById("SubmitButtonDiv");
@@ -138,7 +194,7 @@ $( document ).ready(function() {
     // Get voter IDs
     contractInstance.getVotersKeys().then(function(voterList){
       var t = document.createTextNode("Voter IDs: " + voterList);
-      voterListDiv.appendChild(t);    
+      voterListDiv.appendChild(t);
     })
 
     // Voter ID Input
@@ -172,7 +228,7 @@ $( document ).ready(function() {
     s.type = "submit";
     s.value = "Submit";
     submitButtonDiv.appendChild(s);
-  });
+  });*/
 });
 
 function hexToString(hexx) {

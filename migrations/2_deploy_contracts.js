@@ -1,9 +1,11 @@
 //var Voting = artifacts.require("./Voting.sol");
 var ballot = artifacts.require("./ballot.sol");
+var admin = artifacts.require("./admin.sol");
 var ownable = artifacts.require("./ownable.sol");
 module.exports = function(deployer) {
   //deployer.deploy(Voting, ['Rama', 'Nick', 'Jose'], {gas: 670000});
-  deployer.deploy(ballot);
+  //deployer.deploy(ballot).then(() => console.log("Ballot adress: "+ballot.address));
+  deployer.deploy(admin).then(() => console.log("Admin adress: "+admin.address));
   deployer.deploy(ownable);
 };
 /* As you can see above, the deployer expects the first argument to   be the name of the contract followed by constructor arguments. In our case, there is only one argument which is an array of

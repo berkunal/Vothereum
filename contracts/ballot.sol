@@ -1,6 +1,7 @@
 pragma solidity ^0.4.18;
 
 import "./ownable.sol";
+import "./admin.sol";
 
 contract Ballot is Ownable {
 
@@ -35,9 +36,33 @@ contract Ballot is Ownable {
 
     // Voting done or not
     bool private counted;
+    
+    // Admin address
+    address private admin;
+    
+    // ID of the ballot
+    uint private ballotId;
+    
+    function setBallotId(uint _ballotId) public onlyAdmin {
+        ballotId = _ballotId;
+    }
+    
+    function getBallotId() public view returns (uint) {
+        return ballotId;
+    }
+    
+    // Function modifier to restrict function calls only to Admin
+    modifier onlyAdmin() {
+        require(msg.sender == admin);
+        _;
+    }
+    
+    function initializeAdmin(address adminAddress) public onlyOwner {
+        admin = adminAddress;
+    }
 
     // Admin
-    function initializeCandidates(bytes32[] _candidates) external onlyOwner {
+    function initializeCandidates(bytes32[] _candidates) public onlyAdmin {
         for (uint i = 0; i < _candidates.length; i++) {
             candidates.push(Candidate({
                 id: i, 
@@ -50,7 +75,7 @@ contract Ballot is Ownable {
     }
 
     // Admin
-    function initializeVoters(uint[] _voters) public onlyOwner {
+    function initializeVoters(uint[] _voters) public onlyAdmin {
         for (uint i = 0; i < _voters.length; i++) {
             voters[_voters[i]].id = _voters[i];
             voters[_voters[i]].voted = false;
@@ -78,7 +103,7 @@ contract Ballot is Ownable {
     }
 
     // Admin
-    function countVotes() public onlyOwner {
+    function countVotes() public onlyAdmin {
         // Update the votecount of candidates and mark votes counted
         for (uint i = 0; i < votes.length; i++) {
             candidates[votes[i].candidateId].voteCount++;
