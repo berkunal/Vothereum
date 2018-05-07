@@ -6,27 +6,36 @@
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
 </head>
 <body class="container">
-  <h1>Decentralized Voting Application on Ethereum Blockchain</h1>
+  <h1 id="h1">Decentralized Voting Application on Ethereum Blockchain</h1>
 
-  <div id="InitialSelectionButtonDiv"></div>
+  <div id="ButtonSelectionDiv"></div><br>
 
-  <!--
+  <div id="MainDiv"></div>
+
+  <div id="txStatus"></div>
+
+</body>
+<script id="adminHTML" type="text/html">
   <form onsubmit="initializeBallot()">
-    Candidate List(For admins):<br>
-    <input type="text" name="candidateList" id="candList"><br>
-    Voter List(For admins):<br>
-    <input type="text" name="voterList" id="voterList"><br>
+    Ballot ID: <input type="text" name="ballotID" id="ballotId" size="20"><br>
+    Candidate List: <input type="text" name="candidateList" id="candList" size="20"><br>
+    Voter List: <input type="text" name="voterList" id="voterList" size="20"><br>
     <input type="submit" value="Initialize"><br>
+  </form><br><br>
+  <button onclick="countVotes()">Count Votes</button><br><br>
+  <form onsubmit="addBallot()">
+    Ballot Address: <input type="text" name="ballotAddress" id="ballotAddress"><br>
+    <input type="submit" value="Add Ballot"><br>
   </form>
+</script>
 
+<script id="ballotHTML" type="text/html">
   <form id="voteForm" onsubmit="vote()">
     <div id="VoterListDiv"><br></div>
     <div id="VoterDiv">Enter Your ID<br></div>
     <div id="CandidatesDiv">Select Candidate<br></div>
     <div id="SubmitButtonDiv"><br></div>
   </form>
-
-  <button onclick="countVotes()">Count Votes(For admins)</button>
 
   <form onsubmit="validateVote()">
       Enter your ID to check if your vote has been counted or not:<br>
@@ -36,9 +45,7 @@
 
   <button onclick="getResult()">Get Results</button>
   <div id="result"></div>
-  -->
-
-</body>
+</script>
 
 <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>
 <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>

@@ -42,6 +42,10 @@ contract Ballot is Ownable {
     
     // ID of the ballot
     uint private ballotId;
+
+    function Ballot(address _adminAddress) public {
+        admin = _adminAddress;
+    }
     
     function setBallotId(uint _ballotId) public onlyAdmin {
         ballotId = _ballotId;
@@ -57,7 +61,7 @@ contract Ballot is Ownable {
         _;
     }
     
-    function initializeAdmin(address adminAddress) public onlyOwner {
+    function setAdmin(address adminAddress) public onlyOwner {
         admin = adminAddress;
     }
 

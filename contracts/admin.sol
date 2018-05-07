@@ -13,9 +13,6 @@ contract Admin is Ownable {
     // Ballot map ballotID(incremental) to ballotAddress
     address[] private ballots;
     
-    function Admin()public {
-    }
-    
     function addBallot(address _ballotAddress) public onlyOwner {
         ballots.push(_ballotAddress);
         BallotInterface ballotContract = BallotInterface(_ballotAddress);
@@ -38,7 +35,8 @@ contract Admin is Ownable {
     function initializeCandidatesForAllBallots(bytes32[] _candidates) public onlyOwner {
         for (uint i = 0; i < ballots.length; i++) {
             BallotInterface ballotContract = BallotInterface(ballots[i]);
-            ballotContract.initializeCandidates(_candidates);
+            
+        ballotContract.initializeCandidates(_candidates);
         }
     }
     
