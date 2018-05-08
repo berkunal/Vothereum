@@ -187,7 +187,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 721,
+          "SourceUnit": 725,
           "absolutePath": "/C/Users/Berk/voting/contracts/ownable.sol",
           "file": "./ownable.sol",
           "scope": 198,
@@ -490,14 +490,14 @@
       {
         "attributes": {
           "contractDependencies": [
-            720
+            724
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             197,
-            720
+            724
           ],
           "name": "Admin",
           "scope": 198
@@ -514,7 +514,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 720,
+                  "referencedDeclaration": 724,
                   "type": "contract Ownable"
                 },
                 "id": 24,
@@ -633,7 +633,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -1320,7 +1320,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -1625,7 +1625,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2128,7 +2128,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2400,7 +2400,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2800,9 +2800,9 @@
     "3": {
       "events": {},
       "links": {},
-      "address": "0x08d5330a5ace3102e9752d00bde28af09a23d610"
+      "address": "0x3b08a543fbf65ddd0d2bea0e710e5b8a5c47e3eb"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-05-07T21:25:36.048Z"
+  "updatedAt": "2018-05-08T22:54:43.102Z"
 }

@@ -4,7 +4,7 @@ var admin = artifacts.require("./admin.sol");
 var ownable = artifacts.require("./ownable.sol");
 module.exports = function(deployer) {
   //deployer.deploy(Voting, ['Rama', 'Nick', 'Jose'], {gas: 670000});
-  deployer.deploy(ballot, '0x08d5330a5ace3102e9752d00bde28af09a23d610').then(() => console.log("Ballot adress: "+ballot.address));
+  deployer.deploy(ballot, '0x3b08a543fbf65ddd0d2bea0e710e5b8a5c47e3eb').then(() => console.log("Ballot adress: "+ballot.address));
   //deployer.deploy(admin).then(() => console.log("Admin adress: "+admin.address));
   deployer.deploy(ownable);
 };

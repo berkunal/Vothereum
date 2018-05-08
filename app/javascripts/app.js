@@ -21,25 +21,16 @@ import admin_artifacts from '../../build/contracts/Admin.json'
 var Ballot = contract(ballot_artifacts);
 var Admin = contract(admin_artifacts);
 
-var currentBallotAddress;
+//var adminAddress = '0x08d5330a5ace3102e9752d00bde28af09a23d610';
 
-// Vote function
-window.vote = function() {
-  var candidateId, voterId;
-  for (let i = 0; i < document.getElementsByName('candidate').length; i++) {
-    if ( document.getElementsByName('candidate')[i].checked ) {
-      candidateId = i;
-      break;
-    } 
-  }
-  voterId = document.getElementById("voter").value;
-  try {
-    Ballot.deployed().then(function(contractInstance) {
-      contractInstance.vote(voterId, candidateId, {gas: 1000000, from: web3.eth.accounts[0]});
-    });
-  } catch (err) {
-    console.log(err);
-  }
+// Add new ballot to admin
+window.addBallot = function() {
+  Admin.deployed().then(function(contractInstance) {
+    document.getElementById("txStatus").innerHTML = "Tx pending...";
+    var ballotAddress = document.getElementById("ballotAddress").value;
+    contractInstance.addBallot(ballotAddress, {gas: 1000000, from: web3.eth.accounts[0]})
+    alert("Submitted transaction");
+  })
 }
 
 // Calls initCand and initVoter
@@ -52,75 +43,87 @@ window.initializeBallot = function() {
 
   initCand(ballotId, candidateList);
   initVoter(ballotId, voterList);
+  alert("Submitted transaction");
 }
-
 
 // Init candidates function
 function initCand(ballotId, p1) {
-  Admin.at('0x08d5330a5ace3102e9752d00bde28af09a23d610').then(function(contractInstance) {
+  Admin.deployed().then(function(contractInstance) {
     contractInstance.initializeCandidates(ballotId, p1, {gas: 1000000, from: web3.eth.accounts[0]})
   });
 }
 
 // Init voters function
 function initVoter(ballotId, p1) {
-  Admin.at('0x08d5330a5ace3102e9752d00bde28af09a23d610').then(function(contractInstance) {
+  Admin.deployed().then(function(contractInstance) {
     contractInstance.initializeVoters(ballotId, p1, {gas: 1000000, from: web3.eth.accounts[0]})
   });
 }
 
 // Count Votes
 window.countVotes = function() {
-  Ballot.deployed().then(function(contractInstance) {
+  Admin.deployed().then(function(contractInstance) {
     contractInstance.countVotes({gas: 1000000, from: web3.eth.accounts[0]});
+    alert("Submitted transaction");
   });
 }
 
-// Get Results (Free)
-window.getResult = function() {
-  Ballot.deployed().then(function(contractInstance) {
-    var resultDiv = document.getElementById("result");
+// Vote function
+window.vote = function() {
+  var candidateId, voterId;
+  for (let i = 0; i < document.getElementsByName('candidate').length; i++) {
+    if ( document.getElementsByName('candidate')[i].checked ) {
+      candidateId = document.getElementsByName('candidate')[i].id;
+      break;
+    } 
+  }
+  voterId = document.getElementById("voter").value;
 
-    // Get the names first
-    var nameArray = [];
-    var resultList = [];
-    contractInstance.getResults().then(function(resList) {
-      resultList = resList;
-      for (var i = 0; i < resultList.length; i+=2) {
-        contractInstance.getCandidateName(resultList[i]).then(function(name){
-          nameArray.push(hexToString(name));
-        })
-      }
-    }).then(function() {
-      for (var i = 0; i < resultList.length; i+=2) {
-        var r = resultList[i+1].toString();
-        var t = document.createTextNode(nameArray[i] + ": " + r);
-        resultDiv.appendChild(t);
-        var spaceBr= document.createElement("br");
-        resultDiv.appendChild(spaceBr);
-      }
-    });
-  });
-}
+  var ballotId = document.getElementById("ballotId").value;
 
-// Validate Vote (Free)
-window.validateVote = function() {
-  Ballot.deployed().then(function(contractInstance) {
-    contractInstance.validateVote(document.getElementById("voterID").value).then(function(value) {
-      alert(value);
+  Admin.deployed().then(function(adminContractInstance) {
+    adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
+      Ballot.at(ballotAddress).then(function(contractInstance) {
+        contractInstance.vote(voterId, candidateId, {gas: 1000000, from: web3.eth.accounts[0]});
+        alert("Submitted transaction");
+      });
     })
   })
 }
 
-// Add new ballot to admin
-window.addBallot = function() {
-  Admin.at('0x08d5330a5ace3102e9752d00bde28af09a23d610').then(function(contractInstance) {
-    document.getElementById("txStatus").innerHTML = "Tx pending...";
-    var ballotAddress = document.getElementById("ballotAddress").value;
-    contractInstance.addBallot(ballotAddress, {gas: 1000000, from: web3.eth.accounts[0]})
+// Get Results (Free)
+window.getResult = function() {
+  var ballotId = document.getElementById("ballotId").value;
+  Admin.deployed().then(function(adminContractInstance) {
+    adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
+      Ballot.at(ballotAddress).then(function(contractInstance) {
+        var resultDiv = document.getElementById("result");
+        contractInstance.getResults().then(function(resultList) {
+          for (var i = 0; i < resultList.length; i+=2) {
+            var t = document.createTextNode(document.getElementById("cand"+resultList[i].toString()).value + ": " + resultList[i+1].toString());
+            resultDiv.appendChild(t);
+            var spaceBr= document.createElement("br");
+            resultDiv.appendChild(spaceBr);
+          }
+        })
+      });
+    })
   })
 }
 
+// Validate Vote (Free)
+window.validateVote = function() {
+  var ballotId = document.getElementById("ballotId").value;
+  Admin.deployed().then(function(adminContractInstance) {
+    adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
+      Ballot.at(ballotAddress).then(function(contractInstance) {
+        contractInstance.validateVote(document.getElementById("voterID").value).then(function(value) {
+          alert(value);
+        })
+      })
+    })
+  })
+}
 
 // Initial admin and ballot selection page
 function selectionDivision() {
@@ -156,7 +159,7 @@ function redirectToAdminPage() {
 
 // Set main div to spesific Ballot page
 function redirectToBallotPage(ballotId) {
-  Admin.at('0x08d5330a5ace3102e9752d00bde28af09a23d610').then(function(adminContractInstance) {
+  Admin.deployed().then(function(adminContractInstance) {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
       Ballot.at(ballotAddress).then(function(contractInstance) {
         document.getElementById("MainDiv").innerHTML = document.getElementById("ballotHTML").innerHTML;
@@ -164,6 +167,8 @@ function redirectToBallotPage(ballotId) {
         var candidatesDiv = document.getElementById("CandidatesDiv");
         var submitButtonDiv = document.getElementById("SubmitButtonDiv");
         var voterListDiv = document.getElementById("VoterListDiv");
+        document.getElementById("ballotId").innerHTML = "Ballot " + ballotId;
+        document.getElementById("ballotId").value = ballotId;
 
         // Get voter IDs
         contractInstance.getVotersKeys().then(function(voterList){
@@ -181,14 +186,14 @@ function redirectToBallotPage(ballotId) {
         // Candidate Radio Buttons
         contractInstance.getCandidateIdList().then(function(candList){
           for (var i = 0; i < candList.length; i++) {
-            contractInstance.getCandidateName(candList[i]).then(function(name){
+            contractInstance.getCandidateName(candList[i]).then(function(result){
               var c = document.createElement("input");
               c.type = "radio";
-              c.id = "candidate_"+i;
+              c.id = "cand"+result[1];
               c.name = "candidate";
-              c.value = i;
+              c.value = hexToString(result[0]);
               candidatesDiv.appendChild(c);
-              var t = document.createTextNode(" "+hexToString(name));
+              var t = document.createTextNode(" "+hexToString(result[0]));
               candidatesDiv.appendChild(t);
 
               var spaceBr= document.createElement("br");

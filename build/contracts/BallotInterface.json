@@ -87,7 +87,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 721,
+          "SourceUnit": 725,
           "absolutePath": "/C/Users/Berk/voting/contracts/ownable.sol",
           "file": "./ownable.sol",
           "scope": 198,
@@ -390,14 +390,14 @@
       {
         "attributes": {
           "contractDependencies": [
-            720
+            724
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             197,
-            720
+            724
           ],
           "name": "Admin",
           "scope": 198
@@ -414,7 +414,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 720,
+                  "referencedDeclaration": 724,
                   "type": "contract Ownable"
                 },
                 "id": 24,
@@ -533,7 +533,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -1220,7 +1220,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -1525,7 +1525,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2028,7 +2028,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2300,7 +2300,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 694,
+                      "referencedDeclaration": 698,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -2698,5 +2698,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-05-07T20:54:33.141Z"
+  "updatedAt": "2018-05-08T22:49:11.505Z"
 }

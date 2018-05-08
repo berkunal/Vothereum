@@ -141,8 +141,8 @@ contract Ballot is Ownable {
     }
 
     // Return candidate name associated with the given candidate id
-    function getCandidateName(uint _candidateId) public view returns (bytes32) {
-        return candidates[_candidateId].name;
+    function getCandidateName(uint _candidateId) public view returns (bytes32, uint) {
+        return (candidates[_candidateId].name, _candidateId);
     }
 
     // Return candidate id list
