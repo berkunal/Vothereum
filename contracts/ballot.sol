@@ -145,6 +145,11 @@ contract Ballot is Ownable {
         return (candidates[_candidateId].name, _candidateId);
     }
 
+    // Return candidate name associated with the given candidate id
+    function getCandidateVoteCount(uint _candidateId) public view returns (uint, uint) {
+        return (candidates[_candidateId].voteCount, _candidateId);
+    }
+
     // Return candidate id list
     function getCandidateIdList() public view returns (uint[]) {
         return candidateIdList;
@@ -156,7 +161,7 @@ contract Ballot is Ownable {
     }
 
     // Return true if Voter associated with given voter id is exist
-    function voterExists(uint _voterId) private view returns (bool) {
+    function voterExists(uint _voterId) public view returns (bool) {
         uint i;
         for (i = 0; i < votersKeys.length; i++) {
             if (votersKeys[i] == _voterId) {
@@ -167,7 +172,7 @@ contract Ballot is Ownable {
     }
 
     // Return true if Candidate associated with given candidate id is exist
-    function candidateExists(uint _candidateId) private view returns (bool) {
+    function candidateExists(uint _candidateId) public view returns (bool) {
         uint i;
         for (i = 0; i < candidates.length; i++) {
             if (candidates[i].id == _candidateId) {

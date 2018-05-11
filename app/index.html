@@ -27,25 +27,34 @@
     Ballot Address: <input type="text" name="ballotAddress" id="ballotAddress"><br>
     <input type="submit" value="Add Ballot"><br>
   </form>
+  <form onsubmit="addPublicKey();return false;">
+    VoterID: <input type="text" name="voterID" id="voterID"><br>
+    Public Key Pem: <input type="text" name="publicKeyPem" id="publicKeyPem"><br>
+    <input type="submit" value="Add Public Key"><br>
+  </form>
 </script>
 
-<script id="ballotHTML" type="text/html">
-  <h2 id="ballotId"></h2>
-  <form id="voteForm" onsubmit="vote();return false;">
-    <div id="VoterListDiv"><br></div>
-    <div id="VoterDiv">Enter Your ID<br></div>
-    <div id="CandidatesDiv">Select Candidate<br></div>
-    <div id="SubmitButtonDiv"><br></div>
-  </form>
-
-  <form onsubmit="validateVote();return false;">
-      Enter your ID to check if your vote has been counted or not:<br>
-      <input type="text" name="voterID" id="voterID"><br>
-    <input type="submit" value="Validate"><br>
+<script id="authHTML" type="text/html">
+  <form onsubmit="authenticate();return false;">
+    <h2 id="ballotId"></h2>
+    ID:<br><input type="text" name="voterID" id="voterID"><br>
+    PrivKey Pem:<br><input type="text" name="voterPrivKeyPem" id="voterPrivKeyPem"><br>
+    <input type="submit" value="Authenticate"><br>
   </form>
 
   <button onclick="getResult()">Get Results</button>
   <div id="result"></div>
+</script>
+
+<script id="ballotHTML" type="text/html">
+  <h2 id="ballotId"></h2>
+  <h3 id="voterId"></h3>
+  <form id="voteForm" onsubmit="vote()">
+    <div id="CandidatesDiv">Select Candidate<br></div>
+    <div id="SubmitButtonDiv"><br></div>
+  </form>
+
+  <button onclick="validateVote()">Validate</button>
 </script>
 
 <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>

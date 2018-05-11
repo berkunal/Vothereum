@@ -12,6 +12,17 @@ contract BallotInterface {
 contract Admin is Ownable {
     // Ballot map ballotID(incremental) to ballotAddress
     address[] private ballots;
+
+    // PublicKeys is a map. Key: voter id, Value: public key
+    mapping (uint => bytes) private publicKeys;
+
+    function addPublicKey(uint _voterId, bytes _publicKey) public onlyOwner {
+        publicKeys[_voterId] = _publicKey;
+    }
+
+    function getPublicKey(uint _voterId) public view returns (bytes) {
+        return publicKeys[_voterId];
+    }
     
     function addBallot(address _ballotAddress) public onlyOwner {
         ballots.push(_ballotAddress);
