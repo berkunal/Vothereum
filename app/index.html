@@ -6,7 +6,8 @@
   <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
 </head>
 <body class="container">
-  <h1 id="h1">Decentralized Voting Application on Ethereum Blockchain</h1>
+  <h1 id="h1">Vothereum</h1>
+  <p class="help-block" id="serverPub">Decentralized Voting Application on Ethereum Blockchain</p>
 
   <div id="ButtonSelectionDiv"></div><br>
 
@@ -17,44 +18,88 @@
 </body>
 <script id="adminHTML" type="text/html">
   <form onsubmit="initializeBallot();return false;">
-    Ballot ID: <input type="text" name="ballotID" id="ballotId" size="20"><br>
-    Candidate List: <input type="text" name="candidateList" id="candList" size="20"><br>
-    Voter List: <input type="text" name="voterList" id="voterList" size="20"><br>
-    <input type="submit" value="Initialize"><br>
+    <div class="form-group">
+      <label for="ballotId">Ballot ID</label>
+      <input type="text" class="form-control" name="ballotID" id="ballotId">
+    </div>
+    <div class="form-group">
+      <label for="candList">Candidate List</label>
+      <input type="text" class="form-control" name="candidateList" id="candList">
+    </div>
+    <div class="form-group">
+      <label for="voterList">Voter List</label>
+      <input type="text" class="form-control" name="voterList" id="voterList">
+    </div>
+    <input type="submit" value="Initialize" class="btn btn-primary">
   </form><br><br>
-  <button onclick="countVotes()">Count Votes</button><br><br>
+
+  <form onsubmit="countVotes();return false;">
+    <div class="form-group">
+      <label for="serverPrivateKeyPem">server privKey</label>
+      <input type="text" class="form-control" name="serverPrivateKeyPem" id="serverPrivateKeyPem">
+    </div>
+    <input type="submit" value="Count Votes" class="btn btn-primary">
+  </form><br><br>
+
   <form onsubmit="addBallot();return false;">
-    Ballot Address: <input type="text" name="ballotAddress" id="ballotAddress"><br>
-    <input type="submit" value="Add Ballot"><br>
-  </form>
-  <form onsubmit="addPublicKey();return false;">
-    VoterID: <input type="text" name="voterID" id="voterID"><br>
-    Public Key Pem: <input type="text" name="publicKeyPem" id="publicKeyPem"><br>
-    <input type="submit" value="Add Public Key"><br>
+    <div class="form-group">
+      <label for="ballotAddress">Ballot Address</label>
+      <input type="text" class="form-control" name="ballotAddress" id="ballotAddress">
+    </div>
+    <input type="submit" value="Add Ballot" class="btn btn-primary">
+  </form><br><br>
+
+  <form onsubmit="addVoterPublicKey();return false;">
+    <div class="form-group">
+      <label for="voterID">VoterID</label>
+      <input type="text" class="form-control" name="voterID" id="voterID">
+    </div>
+    <div class="form-group">
+      <label for="publicKeyPem">Public Key Pem</label>
+      <input type="text" class="form-control" name="publicKeyPem" id="publicKeyPem">
+    </div>
+    <input type="submit" value="Add Voter Public Key" class="btn btn-primary">
+  </form><br><br>
+
+  <form onsubmit="setServerPublicKey();return false;">
+    <div class="form-group">
+      <label for="serverPublicKeyPem">Server Public Key Pem</label>
+      <input type="text" class="form-control" name="serverPublicKeyPem" id="serverPublicKeyPem">
+    </div>
+    <input type="submit" value="Set Server Public Key" class="btn btn-primary">
   </form>
 </script>
 
 <script id="authHTML" type="text/html">
   <form onsubmit="authenticate();return false;">
     <h2 id="ballotId"></h2>
-    ID:<br><input type="text" name="voterID" id="voterID"><br>
-    PrivKey Pem:<br><input type="text" name="voterPrivKeyPem" id="voterPrivKeyPem"><br>
-    <input type="submit" value="Authenticate"><br>
-  </form>
+    <div class="form-group">
+      <label for="voterID">ID</label>
+      <input type="text" class="form-control" name="voterID" id="voterID">
+    </div>
+    <div class="form-group">
+      <label for="voterPrivKeyPem">Private Key Pem</label>
+      <input type="text" class="form-control" name="voterPrivKeyPem" id="voterPrivKeyPem">
+    </div>
+    <input type="submit" value="Authenticate" class="btn btn-primary">
+  </form><br><br>
 
-  <button onclick="getResult()">Get Results</button>
-  <div id="result"></div>
+  <button onclick="getResult()" class="btn btn-primary">Get Results</button>
+  <table id="result" class="table table-striped"></table>
 </script>
 
 <script id="ballotHTML" type="text/html">
   <h2 id="ballotId"></h2>
   <h3 id="voterId"></h3>
+  <p class="help-block" id="signature">Signature</p>
+  
   <form id="voteForm" onsubmit="vote()">
-    <div id="CandidatesDiv">Select Candidate<br></div>
-    <div id="SubmitButtonDiv"><br></div>
-  </form>
+    <label for="CandidatesDiv">Select Candidate</label>
+    <div id="CandidatesDiv" class="checkbox"></div>
+    <div id="SubmitButtonDiv"></div>
+  </form><br><br>
 
-  <button onclick="validateVote()">Validate</button>
+  <button onclick="validateVote()" class="btn btn-primary">Validate</button>
 </script>
 
 <script src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.js"></script>

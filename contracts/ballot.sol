@@ -1,9 +1,8 @@
 pragma solidity ^0.4.18;
 
-import "./ownable.sol";
 import "./admin.sol";
 
-contract Ballot is Ownable {
+contract Ballot {
 
     struct Voter {
         uint id; // like tc no
@@ -18,7 +17,8 @@ contract Ballot is Ownable {
 
     struct Vote {
         uint voterId; // Who voted
-        uint candidateId; // To who
+        bytes encryptedCandidateId; // To who
+        bytes signature;
         bool counted; // Counted or not
     }
 
@@ -32,7 +32,8 @@ contract Ballot is Ownable {
     uint[] private results;
 
     // Vote array
-    Vote[] private votes;
+    mapping (uint => Vote) private votes;
+    uint[] private votesKeys;
 
     // Voting done or not
     bool private counted;
@@ -42,6 +43,12 @@ contract Ballot is Ownable {
     
     // ID of the ballot
     uint private ballotId;
+
+    // Function modifier to restrict function calls only to Admin
+    modifier onlyAdmin() {
+        require(msg.sender == admin);
+        _;
+    }
 
     function Ballot(address _adminAddress) public {
         admin = _adminAddress;
@@ -55,14 +62,8 @@ contract Ballot is Ownable {
         return ballotId;
     }
     
-    // Function modifier to restrict function calls only to Admin
-    modifier onlyAdmin() {
-        require(msg.sender == admin);
-        _;
-    }
-    
-    function setAdmin(address adminAddress) public onlyOwner {
-        admin = adminAddress;
+    function setAdmin(address _adminAddress) public onlyAdmin {
+        admin = _adminAddress;
     }
 
     // Admin
@@ -88,56 +89,42 @@ contract Ballot is Ownable {
     }
 
     // User
-    function vote(uint _voterId, uint _candidateId) external onlyOwner {
+    function vote(uint _voterId, bytes _encryptedCandidateId, bytes _signature) external {
         // check if _voterId or _candidateId is exists
-        require(voterExists(_voterId) && candidateExists(_candidateId));
+        require(voterExists(_voterId));
 
         // terminate if voted
         require(!voters[_voterId].voted);
 
         // Create new vote
-        votes.push(Vote({
-                voterId: _voterId, 
-                candidateId: _candidateId, 
-                counted: false
-            }));
+        votes[_voterId].voterId = _voterId;
+        votes[_voterId].encryptedCandidateId = _encryptedCandidateId;
+        votes[_voterId].signature = _signature;
+        votes[_voterId].counted = false;
+        votesKeys.push(_voterId);
 
         // Mark voter as voted
         voters[_voterId].voted = true;
     }
 
-    // Admin
-    function countVotes() public onlyAdmin {
-        // Update the votecount of candidates and mark votes counted
-        for (uint i = 0; i < votes.length; i++) {
-            candidates[votes[i].candidateId].voteCount++;
-            votes[i].counted = true;
-        }
-        counted = true;
-        // Fill the results array
-        for (i = 0; i < candidates.length; i++) {
-            results.push(i);
-            results.push(candidates[i].voteCount);
-        }
+    // Return votes' keys
+    function getVotesKeys() public view returns (uint[]) {
+        return votesKeys;
+    }
+    
+    // Get encrypted and signed Votes
+    function getVote(uint _voterId) public view returns (uint, bytes, bytes) {
+        return (votes[_voterId].voterId, votes[_voterId].encryptedCandidateId, votes[_voterId].signature);
     }
 
-    // Return the results of counting
-    function getResults() public view returns (uint[]) {
-        if (!counted) {
-            return;
-        } else {
-            return results;
-        }
+    // Set votes counted status to true
+    function setVoteCountedTrue(uint _voteId) public onlyAdmin {
+        votes[_voteId].counted = true;
     }
 
     // Voter's vote counted or not?
     function validateVote(uint _voterId) public view returns (bool) {
-        for (uint i = 0; i < votes.length; i++) {
-            if (votes[i].voterId == _voterId) {
-                return votes[i].counted;
-            }
-        }
-        return false;
+        return votes[_voterId].counted;
     }
 
     // Return candidate name associated with the given candidate id
@@ -145,7 +132,19 @@ contract Ballot is Ownable {
         return (candidates[_candidateId].name, _candidateId);
     }
 
-    // Return candidate name associated with the given candidate id
+    function incrementCandidateVoteCount(uint _candidateId) public onlyAdmin {
+        uint i;
+        for (i = 0; i < candidates.length; i++) {
+            if (candidates[i].id == _candidateId) {
+                break;
+            }
+        }
+        require(i != candidates.length);
+
+        candidates[i].voteCount++;
+    }
+
+    // Return candidate vote count associated with the given candidate id
     function getCandidateVoteCount(uint _candidateId) public view returns (uint, uint) {
         return (candidates[_candidateId].voteCount, _candidateId);
     }

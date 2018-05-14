@@ -6,7 +6,8 @@ contract BallotInterface {
     function setBallotId(uint _ballotId) public;
     function initializeCandidates(bytes32[] _candidates) public;
     function initializeVoters(uint[] _voters) public;
-    function countVotes() public;
+    function setVoteCountedTrue(uint _voteId) public;
+    function incrementCandidateVoteCount(uint _candidateId) public;
 }
 
 contract Admin is Ownable {
@@ -15,13 +16,24 @@ contract Admin is Ownable {
 
     // PublicKeys is a map. Key: voter id, Value: public key
     mapping (uint => bytes) private publicKeys;
+    
+    // Server Public Key
+    bytes private serverPublicKeyPem;
 
-    function addPublicKey(uint _voterId, bytes _publicKey) public onlyOwner {
+    function addVoterPublicKey(uint _voterId, bytes _publicKey) public onlyOwner {
         publicKeys[_voterId] = _publicKey;
     }
 
-    function getPublicKey(uint _voterId) public view returns (bytes) {
+    function getVoterPublicKey(uint _voterId) public view returns (bytes) {
         return publicKeys[_voterId];
+    }
+
+    function setServerPublicKey(bytes _serverPublicKeyPem) public onlyOwner {
+        serverPublicKeyPem = _serverPublicKeyPem;
+    }
+
+    function getServerPublicKey() public view returns (bytes) {
+        return serverPublicKeyPem;
     }
     
     function addBallot(address _ballotAddress) public onlyOwner {
@@ -46,8 +58,7 @@ contract Admin is Ownable {
     function initializeCandidatesForAllBallots(bytes32[] _candidates) public onlyOwner {
         for (uint i = 0; i < ballots.length; i++) {
             BallotInterface ballotContract = BallotInterface(ballots[i]);
-            
-        ballotContract.initializeCandidates(_candidates);
+            ballotContract.initializeCandidates(_candidates);
         }
     }
     
@@ -55,12 +66,14 @@ contract Admin is Ownable {
         BallotInterface ballotContract = BallotInterface(ballots[_ballotID]);
         ballotContract.initializeVoters(_voters);
     }
-    
-    function countVotes() public onlyOwner {
-        for (uint i = 0; i < ballots.length; i++) {
-            BallotInterface ballotContract = BallotInterface(ballots[i]);
-            ballotContract.countVotes();
-        }
+
+    function setVoteCountedTrue(uint _ballotID, uint _voteId) public onlyOwner {
+        BallotInterface ballotContract = BallotInterface(ballots[_ballotID]);
+        ballotContract.setVoteCountedTrue(_voteId);
     }
-    
+
+    function incrementCandidateVoteCount(uint _ballotID, uint _candidateId) public onlyOwner {
+        BallotInterface ballotContract = BallotInterface(ballots[_ballotID]);
+        ballotContract.incrementCandidateVoteCount(_candidateId);
+    }
 }
