@@ -71,7 +71,7 @@ window.countVotes = function() {
     adminContractInstance.getBallots().then(function(ballotList) {
       for (var i = 0; i < ballotList.length; i++) {
         countBallot(i, ballotList[i]);
-        console.log("countBallot called with parameters: " + i + " " + ballotList[i]);
+        //console.log("countBallot called with parameters: " + i + " " + ballotList[i]);
       }
     });
   });
@@ -81,8 +81,8 @@ function countBallot(ballotId, ballotAddress) {
   Ballot.at(ballotAddress).then(function(contractInstance) {
     contractInstance.getVotesKeys().then(function(votesKeys) {
       for (var j = 0; j < votesKeys.length; j++) {
+        //console.log("calling countSingleVote with parameters: " + ballotId +" "+ ballotAddress +" "+ votesKeys[j]);
         countSingleVote(ballotId, ballotAddress, votesKeys[j]);
-        console.log("countSingleVote called with parameters: " + ballotId +" "+ ballotAddress +" "+ votesKeys[j]);
       }
     });
   });
@@ -92,23 +92,24 @@ function countSingleVote(ballotId, ballotAddress, voteId) {
   Admin.deployed().then(function(adminContractInstance) {
     Ballot.at(ballotAddress).then(function(contractInstance) {
       contractInstance.getVote(voteId).then(function(result) {
-        var encrypted = hexToString(result[1]);
-        var signature = forge.util.decodeUtf8(hexToString(result[2]));
+        //console.log(result[0] + " Signature: " + hexToString(result[2]) + " ---- Encrypted: " + hexToString(result[1]));
+        var encrypted = forge.util.decode64(hexToString(result[1]));
+        var signature = forge.util.decode64(hexToString(result[2]));
         adminContractInstance.getVoterPublicKey(voteId).then(function(publicKeyPem) {
           var publicKey = forge.pki.publicKeyFromPem(hexToString(publicKeyPem));
           var md = forge.md.sha1.create();
           md.update('sign this', 'utf8');
+
           if (publicKey.verify(md.digest().getBytes(), signature)) {
             console.log(result[0] + ": Valid Vote");
             var serverPrivateKeyPem = document.getElementById("serverPrivateKeyPem").value;
             var privateKey = forge.pki.privateKeyFromPem(serverPrivateKeyPem);
-    
+
             var decrypted = forge.util.decodeUtf8(privateKey.decrypt(encrypted));
-            console.log(result[0] + ": here");
             // increment
             adminContractInstance.incrementCandidateVoteCount(ballotId, decrypted, {gas: 1000000, from: web3.eth.accounts[0]});
             // counted
-            adminContractInstance.setVoteCountedTrue(ballotId, voteId, {gas: 1000000, from: web3.eth.accounts[0]});
+            adminContractInstance.setVoteCountedTrue(ballotId, result[0], {gas: 1000000, from: web3.eth.accounts[0]});
           } else {
             console.log(result[0] + ": Not Valid");
           }
@@ -167,7 +168,7 @@ window.authenticate = function() {
               
               if (publicKey.verify(md.digest().getBytes(), signature)) {
                 alert("You have been authenticated");
-                redirectToBallotPage(ballotId, voterId, forge.util.encodeUtf8(signature));
+                redirectToBallotPage(ballotId, voterId, forge.util.encode64(signature));
               }
             });
           } else {
@@ -243,7 +244,8 @@ window.vote = function() {
   var serverPublicKey = forge.pki.publicKeyFromPem(serverPublicKeyPem);
 
   // Encrypt candidate
-  var encryptedCandidateId = serverPublicKey.encrypt(forge.util.encodeUtf8(candidateId));
+  var encryptedCandidateId = forge.util.encode64(serverPublicKey.encrypt(forge.util.encodeUtf8(candidateId)));
+  //console.log(voterId + " Signature: " + signature + " ---- Encrypted: " + encryptedCandidateId);
 
   Admin.deployed().then(function(adminContractInstance) {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
