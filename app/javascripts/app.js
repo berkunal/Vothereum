@@ -27,9 +27,12 @@ var Admin = contract(admin_artifacts);
 // Admin page function
 // Add new ballot to admin
 window.addBallot = function() {
+  var t0 = performance.now();
   Admin.deployed().then(function(contractInstance) {
     var ballotAddress = document.getElementById("ballotAddress").value;
     contractInstance.addBallot(ballotAddress, {gas: 1000000, from: web3.eth.accounts[0]})
+    var t1 = performance.now();
+    console.log("Call to addBallot took " + (t1 - t0) + " milliseconds.")
     alert("Submitted transaction");
   })
 }
@@ -51,16 +54,22 @@ window.initializeBallot = function() {
 // Admin page function
 // Init candidates function
 function initCand(ballotId, p1) {
+  var t0 = performance.now();
   Admin.deployed().then(function(contractInstance) {
     contractInstance.initializeCandidates(ballotId, p1, {gas: 1000000, from: web3.eth.accounts[0]})
+    var t1 = performance.now();
+    console.log("Call to initCand "+ballotId+" took " + (t1 - t0) + " milliseconds.")
   });
 }
 
 // Admin page function
 // Init voters function
 function initVoter(ballotId, p1) {
+  var t0 = performance.now();
   Admin.deployed().then(function(contractInstance) {
     contractInstance.initializeVoters(ballotId, p1, {gas: 1000000, from: web3.eth.accounts[0]})
+    var t1 = performance.now();
+    console.log("Call to initVoter "+ballotId+" took " + (t1 - t0) + " milliseconds.")
   });
 }
 
@@ -89,6 +98,7 @@ function countBallot(ballotId, ballotAddress) {
 }
 
 function countSingleVote(ballotId, ballotAddress, voteId) {
+  var t0 = performance.now();
   Admin.deployed().then(function(adminContractInstance) {
     Ballot.at(ballotAddress).then(function(contractInstance) {
       contractInstance.getVote(voteId).then(function(result) {
@@ -106,10 +116,12 @@ function countSingleVote(ballotId, ballotAddress, voteId) {
             var privateKey = forge.pki.privateKeyFromPem(serverPrivateKeyPem);
 
             var decrypted = forge.util.decodeUtf8(privateKey.decrypt(encrypted));
-            // increment
+            //increment
             adminContractInstance.incrementCandidateVoteCount(ballotId, decrypted, {gas: 1000000, from: web3.eth.accounts[0]});
-            // counted
+            //counted
             adminContractInstance.setVoteCountedTrue(ballotId, result[0], {gas: 1000000, from: web3.eth.accounts[0]});
+            var t1 = performance.now();
+            console.log("Call to countSingleVote "+voteId+" took " + (t1 - t0) + " milliseconds.")
           } else {
             console.log(result[0] + ": Not Valid");
           }
@@ -122,10 +134,13 @@ function countSingleVote(ballotId, ballotAddress, voteId) {
 // Admin page function
 // Add Public Key
 window.addVoterPublicKey = function() {
+  var t0 = performance.now();
   Admin.deployed().then(function(contractInstance) {
     var voterId = document.getElementById("voterID").value;
     var publicKeyPem = document.getElementById("publicKeyPem").value;
     contractInstance.addVoterPublicKey(voterId ,publicKeyPem, {gas: 1000000, from: web3.eth.accounts[0]});
+    var t1 = performance.now();
+    console.log("Call to addVoterPublicKey took " + (t1 - t0) + " milliseconds.")
     alert("Submitted transaction");
   });
 }
@@ -133,9 +148,12 @@ window.addVoterPublicKey = function() {
 // Admin page function
 // Set Public Key for All Ballots
 window.setServerPublicKey = function() {
+  var t0 = performance.now();
   Admin.deployed().then(function(contractInstance) {
     var publicKeyPem = document.getElementById("serverPublicKeyPem").value;
     contractInstance.setServerPublicKey(publicKeyPem, {gas: 1000000, from: web3.eth.accounts[0]});
+    var t1 = performance.now();
+    console.log("Call to setServerPublicKey took " + (t1 - t0) + " milliseconds.")
     alert("Submitted transaction");
   });
 }
@@ -143,6 +161,7 @@ window.setServerPublicKey = function() {
 // Auth page function
 // Authenticate user with his/hers private key and ID
 window.authenticate = function() {
+  var t0 = performance.now();
   Admin.deployed().then(function(adminContractInstance) {
     var voterId = document.getElementById("voterID").value;
     var ballotId = document.getElementById("ballotId").value;
@@ -166,7 +185,10 @@ window.authenticate = function() {
         
               var publicKey = forge.pki.publicKeyFromPem(hexToString(publicKeyPem));
               
-              if (publicKey.verify(md.digest().getBytes(), signature)) {
+              if (publicKey.verify(md.digest().getBytes(), signature)) {              
+                var t1 = performance.now();
+                console.log("Call to authenticate took " + (t1 - t0) + " milliseconds.")
+
                 alert("You have been authenticated");
                 redirectToBallotPage(ballotId, voterId, forge.util.encode64(signature));
               }
@@ -183,6 +205,7 @@ window.authenticate = function() {
 // Auth page function
 // Get Results
 window.getResult = function() {
+  var t0 = performance.now();
   var ballotId = document.getElementById("ballotId").value;
   Admin.deployed().then(function(adminContractInstance) {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
@@ -196,6 +219,9 @@ window.getResult = function() {
             
             insertNameCell(cell1, candList[i], ballotId);
             insertVoteCountCell(cell2, candList[i], ballotId);
+            
+            var t1 = performance.now();
+            console.log("Call to insertCells "+i+" took " + (t1 - t0) + " milliseconds.")
           }
         })
       });
@@ -204,11 +230,14 @@ window.getResult = function() {
 }
 
 function insertNameCell(cell, candidateId, ballotId) {
+  var t0 = performance.now();
   Admin.deployed().then(function(adminContractInstance) {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
       Ballot.at(ballotAddress).then(function(contractInstance) {   
         contractInstance.getCandidateName(candidateId).then(function(nameResult){
           cell.innerHTML = hexToString(nameResult[0]);
+          var t1 = performance.now();
+          console.log("Call to insertNameCell "+hexToString(nameResult[0])+" took " + (t1 - t0) + " milliseconds.")
         });
       });
     });
@@ -216,11 +245,14 @@ function insertNameCell(cell, candidateId, ballotId) {
 }
 
 function insertVoteCountCell(cell, candidateId, ballotId) {
+  var t0 = performance.now();
   Admin.deployed().then(function(adminContractInstance) {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
       Ballot.at(ballotAddress).then(function(contractInstance) {  
         contractInstance.getCandidateVoteCount(candidateId).then(function(voteResult){
           cell.innerHTML = voteResult[0].toString();
+          var t1 = performance.now();
+          console.log("Call to insertVoteCountCell "+voteResult[0].toString()+" took " + (t1 - t0) + " milliseconds.")
         });
       });
     });
@@ -230,6 +262,7 @@ function insertVoteCountCell(cell, candidateId, ballotId) {
 // Ballot page function
 // Vote function
 window.vote = function() {
+  var t0 = performance.now();
   var candidateId, voterId, signature, ballotId;
   for (let i = 0; i < document.getElementsByName('candidate').length; i++) {
     if ( document.getElementsByName('candidate')[i].checked ) {
@@ -251,6 +284,8 @@ window.vote = function() {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
       Ballot.at(ballotAddress).then(function(contractInstance) {
         contractInstance.vote(voterId, encryptedCandidateId, signature, {gas: 1000000, from: web3.eth.accounts[0]});
+        var t1 = performance.now();
+        console.log("Call to vote took " + (t1 - t0) + " milliseconds.")
         alert("Submitted transaction");
       });
     })
@@ -260,11 +295,14 @@ window.vote = function() {
 // Ballot page function
 // Validate Vote
 window.validateVote = function() {
+  var t0 = performance.now();
   var ballotId = document.getElementById("ballotId").value;
   Admin.deployed().then(function(adminContractInstance) {
     adminContractInstance.getBallotAddressById(ballotId).then(function(ballotAddress) {
       Ballot.at(ballotAddress).then(function(contractInstance) {
         contractInstance.validateVote(document.getElementById("voterId").value).then(function(value) {
+          var t1 = performance.now();
+          console.log("Call to validateVote took " + (t1 - t0) + " milliseconds.")
           alert(value);
         });
       });
@@ -282,7 +320,12 @@ function selectionDivision() {
     adminButton.type = "button";
     adminButton.value = "Admin";
     adminButton.className = "btn btn-default";
-    adminButton.onclick = function() {redirectToAdminPage()};
+    adminButton.onclick = function() {
+      var t0 = performance.now();
+      redirectToAdminPage();
+      var t1 = performance.now();
+      console.log("Call to redirectToAdminPage took " + (t1 - t0) + " milliseconds.")
+    };
     initialSelectionDiv.appendChild(adminButton);
 
     // Ballot buttons
@@ -294,7 +337,12 @@ function selectionDivision() {
           ballotButton.value = "Ballot " + i;
           ballotButton.id = i;
           ballotButton.className = "btn btn-default";
-          ballotButton.onclick = function() {redirectToAuthPage(this.id)};
+          ballotButton.onclick = function() {
+            var t0 = performance.now();
+            redirectToAuthPage(this.id);
+            var t1 = performance.now();
+            console.log("Call to redirectToAuthPage "+this.id+" took " + (t1 - t0) + " milliseconds.")
+          };
           initialSelectionDiv.appendChild(ballotButton);
         }
       })
@@ -361,15 +409,15 @@ function redirectToBallotPage(ballotId, voterId, signature) {
 // Initialization
 $( document ).ready(function() {
   if (typeof web3 !== 'undefined') {
-    console.warn("Using web3 detected from external source like Metamask")
+    //console.warn("Using web3 detected from external source like Metamask")
     // Use Mist/MetaMask's provider
     window.web3 = new Web3(web3.currentProvider);
   } else {
-    console.warn("No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
+    //console.warn("No web3 detected. Falling back to http://localhost:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
     // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
     window.web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
   }
-
+  console.log("Page loaded");
   Ballot.setProvider(web3.currentProvider);
   Admin.setProvider(web3.currentProvider);
 
@@ -379,7 +427,10 @@ $( document ).ready(function() {
     });
   });
 
+  var t0 = performance.now();
   selectionDivision();
+  var t1 = performance.now();
+  console.log("Call to selectionDivision took " + (t1 - t0) + " milliseconds.")
 });
 
 function hexToString(hexx) {

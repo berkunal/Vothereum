@@ -35,6 +35,8 @@
     "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
+    "file-system": "^2.2.2",
+    "fs": "0.0.1-security",
     "secp256k1": "^3.5.0",
     "solc": "^0.4.20",
     "ursa": "^0.9.4"

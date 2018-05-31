@@ -12,39 +12,20 @@
   <div id="ButtonSelectionDiv"></div><br>
 
   <div id="MainDiv"></div>
-
-  <div id="txStatus"></div>
-
 </body>
 <script id="adminHTML" type="text/html">
-  <form onsubmit="initializeBallot();return false;">
+  <form onsubmit="setServerPublicKey();return false;">
     <div class="form-group">
-      <label for="ballotId">Ballot ID</label>
-      <input type="text" class="form-control" name="ballotID" id="ballotId">
+      <label for="serverPublicKeyPem">Server Public Key Pem</label>
+      <input type="text" class="form-control" name="serverPublicKeyPem" id="serverPublicKeyPem" accept=".pem" placeholder="-----BEGIN PUBLIC KEY-----">
     </div>
-    <div class="form-group">
-      <label for="candList">Candidate List</label>
-      <input type="text" class="form-control" name="candidateList" id="candList">
-    </div>
-    <div class="form-group">
-      <label for="voterList">Voter List</label>
-      <input type="text" class="form-control" name="voterList" id="voterList">
-    </div>
-    <input type="submit" value="Initialize" class="btn btn-primary">
-  </form><br><br>
-
-  <form onsubmit="countVotes();return false;">
-    <div class="form-group">
-      <label for="serverPrivateKeyPem">server privKey</label>
-      <input type="text" class="form-control" name="serverPrivateKeyPem" id="serverPrivateKeyPem">
-    </div>
-    <input type="submit" value="Count Votes" class="btn btn-primary">
+    <input type="submit" value="Set Server Public Key" class="btn btn-primary">
   </form><br><br>
 
   <form onsubmit="addBallot();return false;">
     <div class="form-group">
       <label for="ballotAddress">Ballot Address</label>
-      <input type="text" class="form-control" name="ballotAddress" id="ballotAddress">
+      <input type="text" class="form-control" name="ballotAddress" id="ballotAddress" placeholder="0x...">
     </div>
     <input type="submit" value="Add Ballot" class="btn btn-primary">
   </form><br><br>
@@ -52,22 +33,38 @@
   <form onsubmit="addVoterPublicKey();return false;">
     <div class="form-group">
       <label for="voterID">VoterID</label>
-      <input type="text" class="form-control" name="voterID" id="voterID">
+      <input type="text" class="form-control" name="voterID" id="voterID" placeholder="123...">
     </div>
     <div class="form-group">
       <label for="publicKeyPem">Public Key Pem</label>
-      <input type="text" class="form-control" name="publicKeyPem" id="publicKeyPem">
+      <input type="text" class="form-control" name="publicKeyPem" id="publicKeyPem" accept=".pem" placeholder="-----BEGIN PUBLIC KEY-----">
     </div>
     <input type="submit" value="Add Voter Public Key" class="btn btn-primary">
   </form><br><br>
 
-  <form onsubmit="setServerPublicKey();return false;">
+  <form onsubmit="initializeBallot();return false;">
     <div class="form-group">
-      <label for="serverPublicKeyPem">Server Public Key Pem</label>
-      <input type="text" class="form-control" name="serverPublicKeyPem" id="serverPublicKeyPem">
+      <label for="ballotId">Ballot ID</label>
+      <input type="text" class="form-control" name="ballotID" id="ballotId" placeholder="0">
     </div>
-    <input type="submit" value="Set Server Public Key" class="btn btn-primary">
-  </form>
+    <div class="form-group">
+      <label for="candList">Candidate List</label>
+      <input type="text" class="form-control" name="candidateList" id="candList" placeholder="Alice-Bob-...">
+    </div>
+    <div class="form-group">
+      <label for="voterList">Voter List</label>
+      <input type="text" class="form-control" name="voterList" id="voterList" placeholder="123-234-...">
+    </div>
+    <input type="submit" value="Initialize" class="btn btn-primary">
+  </form><br><br>
+
+  <form onsubmit="countVotes();return false;">
+    <div class="form-group">
+      <label for="serverPrivateKeyPem">Server Private Key</label>
+      <input type="text" class="form-control" name="serverPrivateKeyPem" id="serverPrivateKeyPem" accept=".pem" placeholder="-----BEGIN PRIVATE KEY-----">
+    </div>
+    <input type="submit" value="Count Votes" class="btn btn-primary">
+  </form><br><br>
 </script>
 
 <script id="authHTML" type="text/html">
@@ -79,7 +76,7 @@
     </div>
     <div class="form-group">
       <label for="voterPrivKeyPem">Private Key Pem</label>
-      <input type="text" class="form-control" name="voterPrivKeyPem" id="voterPrivKeyPem">
+      <input type="text" class="form-control" name="voterPrivKeyPem" id="voterPrivKeyPem" accept=".pem" placeholder="-----BEGIN PRIVATE KEY-----">
     </div>
     <input type="submit" value="Authenticate" class="btn btn-primary">
   </form><br><br>
